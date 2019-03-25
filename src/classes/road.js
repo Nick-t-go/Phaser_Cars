@@ -1,6 +1,12 @@
-import { Align } from './util/align';
-import { Collision } from './util/collision';
-import { ScreenConfig } from './util/screenConfig';
+import {
+  Align
+} from './util/align';
+import {
+  Collision
+} from './util/collision';
+import {
+  ScreenConfig
+} from './util/screenConfig';
 
 class Road extends Phaser.GameObjects.Container {
   constructor(config) {
@@ -28,14 +34,33 @@ class Road extends Phaser.GameObjects.Container {
   }
 
   addObject() {
-    const objs = [
-      { key: 'pcar1', speed: 10, scale: 0.1 },
-      { key: 'pcar2', speed: 10, scale: 0.1 },
-      { key: 'cone', speed: 20, scale: 0.05 },
-      { key: 'barrier', speed: 20, scale: 0.08 },
-    ];
+    const objs = [{
+      key: 'pcar1',
+      speed: 10,
+      scale: 0.1,
+    },
+    {
+      key: 'pcar2',
+      speed: 10,
+      scale: 0.1,
+    },
+    {
+      key: 'cone',
+      speed: 20,
+      scale: 0.05,
+    },
+    {
+      key: 'barrier',
+      speed: 20,
+      scale: 0.08,
+    }];
+
     const index = Math.floor(Math.random() * 4);
-    const { key, speed, scale } = objs[index];
+    const {
+      key,
+      speed,
+      scale,
+    } = objs[index];
 
     this.object = this.scene.add.sprite(this.back.displayWidth / 4, 0, key);
     this.object.speed = speed;
@@ -49,13 +74,15 @@ class Road extends Phaser.GameObjects.Container {
   }
 
   changeLanes() {
+    if (this.scene.model.gameOver) return;
+    this.scene.emitter.emit(this.scene.G.PLAY_SOUND, 'whoosh');
     const dWidth = this.back.displayWidth;
     this.car.x = this.car.x > 0 ? -dWidth / 4 : dWidth / 4;
   }
 
   makeLines() {
     this.vSpace = this.displayHeight / 10;
-    for (let i = 0; i < 20; i++ ) {
+    for (let i = 0; i < 20; i++) {
       const line = this.scene.add.image(this.x, this.vSpace * i, 'line');
       line.oy = line.y;
       this.lineGroup.add(line);
@@ -75,19 +102,37 @@ class Road extends Phaser.GameObjects.Container {
     }
   }
 
+  goGameOver() {
+    this.scene.start('SceneOver');
+  }
+
   moveObject() {
     this.object.y += this.vSpace / this.object.speed;
     if (Collision.checkCollide(this.car, this.object)) {
-      this.car.alpha = 0.5;
-    } else {
-      this.car.alpha = 1;
-    }
-    if (this.object.y > this.screenHeight()) {
-      this.scene.emitter.emit(this.scene.gameConstants.UP_POINTS, 1);
+      this.scene.emitter.emit(this.scene.G.PLAY_SOUND, 'boom');
+      this.scene.tweens.add({
+        targets: this.car,
+        duration: 1000,
+        y: ScreenConfig.height(),
+        angle: -270,
+      });
+      this.scene.model.gameOver = true;
+      this.scene.time.addEvent({
+        delay: 2000,
+        callback: this.goGameOver,
+        callbackScope: this.scene,
+        loop: false,
+      });
+    } 
+
+    if (this.object.y > this.screenHeight) {
+      this.scene.emitter.emit(this.scene.G.UP_POINTS, 1);
       this.object.destroy();
       this.addObject();
     }
   }
 }
 
-export { Road }
+export {
+  Road
+}

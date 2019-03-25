@@ -3,6 +3,8 @@ class Controller {
     this.model = model;
     emitter.on(G.SET_SCORE, this.setScore, this);
     emitter.on(G.UP_POINTS, this.upPoints, this);
+    emitter.on(G.TOGGLE_SOUND, this.toggleSound, this);
+    emitter.on(G.TOGGLE_MUSIC, this.toggleMusic, this);
   }
 
   setScore(score) {
@@ -13,6 +15,17 @@ class Controller {
     const score = this.model.score + points;
     this.model.score = score;
   }
+
+  toggleSound(val) {
+    this.model.soundOn = val;
+  }
+
+  toggleMusic(val) {
+    this.model.musicOn = val;
+  }
+
 }
 
-export { Controller }
+export {
+  Controller
+}

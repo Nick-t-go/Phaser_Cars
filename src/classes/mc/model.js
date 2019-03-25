@@ -3,6 +3,18 @@ class Model {
     this.emitter = emitter;
     this.gameConstants = gameConstants;
     this._score = 0;
+    this.soundOn = true;
+    this._musicOn = true;
+    this.gameOver = false;
+  }
+
+  set musicOn(val) {
+    this._musicOn = val;
+    this.emitter.emit(this.gameConstants.MUSIC_CHANGED);
+  }
+
+  get musicOn(){
+    return this._musicOn
   }
 
   set score(val) {
