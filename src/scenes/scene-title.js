@@ -37,7 +37,7 @@ class SceneTitle extends Phaser.Scene {
         width: ScreenConfig.width(),
       },
     );
-    //this.alignGrid.showNumbers();
+    this.backImage = this.add.image(ScreenConfig.width() / 2, ScreenConfig.height() / 2, 'titleBack');
 
     const title = this.add.image(0, 0, 'title');
     const btnStart = new FlatButton({

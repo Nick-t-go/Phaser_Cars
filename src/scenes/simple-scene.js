@@ -34,19 +34,28 @@ class SceneMain extends Phaser.Scene {
     super('SceneMain');
   }
 
-  preload() {
-
-  }
 
   create() {
     this.road = new Road({
       scene: this,
     });
-    this.road.x = ScreenConfig.width() / 2;
+    this.road.x = ScreenConfig.width() * 0.25;
     this.road.makeLines();
+
+    this.road2 = new Road({
+      scene: this,
+    });
+    this.road2.x = ScreenConfig.width() * 0.75;
+    this.road2.makeLines();
+
+    this.road2.car.setFrame(1);
+
     this.emitter = new Phaser.Events.EventEmitter();
     this.G = new Constants();
     this.model = new Model(this.emitter, this.G);
+    this.model.speed = 1;
+    this.model.score = 0;
+
     this.controller = new Controller(this.emitter, this.G, this.model);
     this.mediaManager = new MediaManager({
       scene: this,
@@ -56,7 +65,7 @@ class SceneMain extends Phaser.Scene {
     this.scoreBox = new ScoreBox({
       scene: this,
     });
-    this.model.score = 100;
+
 
     const gridConfig = {
       col: 5,
@@ -74,12 +83,27 @@ class SceneMain extends Phaser.Scene {
     this.alignGrid.placeAtIndex(0, this.soundBtns.musicToggle);
     this.alignGrid.placeAtIndex(4, this.soundBtns.sfxToggle);
     this.alignGrid.placeAtIndex(9, this.scoreBox);
+    this.mediaManager.setBackgroundMusic('backgroundMusic');
+    this.emitter.on(this.G.SCORE_UPDATED, this.scoreUpdated, this);
+  }
+
+  scoreUpdated() {
+    if (this.model.score / 5 === Math.floor(this.model.score / 5) && this.model.speed < 1.5) {
+      this.model.speed += 0.25;
+    }
   }
 
   update() {
-    if (this.model.gameOver) return;
+    if (this.model.gameOver) {
+      this.emitter.emit(this.G.TOGGLE_MUSIC, false);
+      return;
+    }
+
     this.road.moveLines();
     this.road.moveObject();
+
+    this.road2.moveLines();
+    this.road2.moveObject();
   }
 }
 

@@ -107,7 +107,7 @@ class Road extends Phaser.GameObjects.Container {
   }
 
   moveObject() {
-    this.object.y += this.vSpace / this.object.speed;
+    this.object.y += (this.vSpace / this.object.speed) * this.scene.model.speed;
     if (Collision.checkCollide(this.car, this.object)) {
       this.scene.emitter.emit(this.scene.G.PLAY_SOUND, 'boom');
       this.scene.tweens.add({
